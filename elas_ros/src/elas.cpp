@@ -56,7 +56,8 @@ public:
   {
     ros::NodeHandle local_nh("~");
     local_nh.param("queue_size", queue_size_, 5);
-
+    local_nh.param<std::string>("left_camera_name", left_camera_name, "camera_color_left");
+    local_nh.param<std::string>("right_camera_name", right_camera_name, "camera_color_right");
     local_nh.param<int>("disp_min", disp_min, 0);
     local_nh.param<int>("disp_max", disp_max, 255);
     local_nh.param<double>("support_threshold", support_threshold, 0.95);
@@ -83,10 +84,10 @@ public:
 
     // Topics
     std::string stereo_ns = nh.resolveName("stereo");
-    std::string left_topic = ros::names::clean(stereo_ns + "/left/" + nh.resolveName("image"));
-    std::string right_topic = ros::names::clean(stereo_ns + "/right/" + nh.resolveName("image"));
-    std::string left_info_topic = stereo_ns + "/left/camera_info";
-    std::string right_info_topic = stereo_ns + "/right/camera_info";
+    std::string left_topic = ros::names::clean(stereo_ns + "/" + left_camera_name + nh.resolveName("image"));
+    std::string right_topic = ros::names::clean(stereo_ns + "/" + right_camera_name + nh.resolveName("image"));
+    std::string left_info_topic = stereo_ns + "/" + left_camera_name + "/camera_info";
+    std::string right_info_topic = stereo_ns + "/" + right_camera_name + "/camera_info";
 
     image_transport::ImageTransport it(nh);
     left_sub_.subscribe(it, left_topic, 1, transport);
@@ -396,6 +397,8 @@ private:
   boost::shared_ptr<ApproximateSync> approximate_sync_;
   boost::shared_ptr<Elas> elas_;
   int queue_size_;
+  std::string left_camera_name;
+  std::string right_camera_name;
 
   // Struct parameters
   int disp_min;
